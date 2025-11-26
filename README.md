@@ -22,4 +22,8 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+
+
+data set retrieved from: https://www.kaggle.com/datasets/iliassekkaf/computerparts/data
 # pixelforge
