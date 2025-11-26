@@ -1,0 +1,25 @@
+<h1>PixelForge PC Supply</h1>
+
+<%= form_with url: products_path, method: :get, local: true do |f| %>
+  <div>
+    <%= f.label :q, "Search" %>
+    <%= f.text_field :q, value: @query %>
+  </div>
+
+  <div>
+    <%= f.label :category_id, "Category" %>
+    <%= f.select :category_id,
+                 options_from_collection_for_select(@categories, :id, :name, @selected_category_id),
+                 include_blank: "All Categories" %>
+  </div>
+
+  <%= f.submit "Search" %>
+<% end %>
+
+<div class="products-grid">
+  <% @products.each do |product| %>
+    <%= render "product", product: product %>
+  <% end %>
+</div>
+
+<%= paginate @products %>
