@@ -13,3 +13,27 @@
  *= require_tree .
  *= require_self
  */
+/* Product card hover effect */
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Make images uniform height */
+.product-image {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Pagination spacing fix */
+.pagination {
+  margin-top: 20px;
+}
+
+.pagination .page-link {
+  border-radius: 6px;
+}

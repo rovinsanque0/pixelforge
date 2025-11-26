@@ -1,7 +1,25 @@
-<h1>Admin Dashboard</h1>
-<p>Welcome, <%= current_user.name %>!</p>
+<h1 class="mb-4">Admin Dashboard</h1>
 
-<ul>
-  <li><%= link_to "Manage Products", admin_products_path %></li>
-  <li><%= link_to "Manage Categories", admin_categories_path %></li>
-</ul>
+<p class="lead">Welcome, <%= current_user.name %>!</p>
+
+<div class="row mt-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Products</h5>
+        <p class="card-text">Manage all store products.</p>
+        <%= link_to "View Products", admin_products_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Categories</h5>
+        <p class="card-text">Manage product categories.</p>
+        <%= link_to "View Categories", admin_categories_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  </div>
+</div>

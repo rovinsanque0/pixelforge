@@ -30,11 +30,30 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
 
+        <!-- LEFT SIDE NAV -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><%= link_to "Products", products_path, class: "nav-link" %></li>
           <li class="nav-item"><%= link_to "Cart (#{session[:cart]&.values&.sum || 0})", cart_path, class: "nav-link" %></li>
         </ul>
 
+        <!-- SEARCH BAR -->
+        <%= form_with url: products_path, method: :get, local: true, class: "d-flex me-3" do %>
+
+          <!-- Category filter -->
+          <%= select_tag :category_id,
+                options_from_collection_for_select(Category.all, :id, :name, params[:category_id]),
+                include_blank: "All Categories",
+                class: "form-select me-2" %>
+
+          <!-- Search field -->
+          <%= text_field_tag :q, params[:q], class: "form-control me-2", placeholder: "Search products..." %>
+
+          <!-- Submit -->
+          <%= submit_tag "Search", class: "btn btn-outline-info" %>
+
+        <% end %>
+
+        <!-- RIGHT SIDE NAV -->
         <ul class="navbar-nav ms-auto">
 
           <% if user_signed_in? %>
@@ -46,9 +65,9 @@
 
             <li class="nav-item">
               <%= button_to "Logout", destroy_user_session_path,
-                  method: :delete,
-                  class: "btn btn-outline-light btn-sm ms-2",
-                  form: { class: "d-inline" } %>
+                    method: :delete,
+                    class: "btn btn-outline-light btn-sm ms-2",
+                    form: { class: "d-inline" } %>
             </li>
 
           <% else %>
