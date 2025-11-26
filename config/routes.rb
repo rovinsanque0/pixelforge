@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :admin do
+    get "dashboard/index"
     root "dashboard#index"
     resources :products
     resources :categories
