@@ -33,10 +33,10 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       # t.datetime :locked_at
 
       t.string :name
-      t.boolean :admin
+      t.boolean :admin, default: false #ensures that new users are not admins by default
       t.string :address
       t.string :city
-      t.references :province
+      t.references :province, foreign_key: true 
 
       t.timestamps null: false
     end
