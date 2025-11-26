@@ -1,6 +1,9 @@
 class OrdersController < ApplicationController
   before_action :load_cart
   before_action :require_cart_not_empty
+  def index
+  @orders = current_user.orders
+  end
 
   def new
     @order = Order.new
@@ -9,6 +12,9 @@ class OrdersController < ApplicationController
       @order.province = current_user.province
     end
   end
+
+
+
 
   def create
     province = find_province

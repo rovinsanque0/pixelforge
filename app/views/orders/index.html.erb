@@ -1,0 +1,15 @@
+<h1>My Orders</h1>
+
+<% if @orders.any? %>
+  <% @orders.each do |order| %>
+    <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 12px;">
+      <strong>Order #<%= order.id %></strong><br>
+      Subtotal: $<%= order.subtotal %><br>
+      Total: $<%= order.total %><br>
+      Status: <%= order.status %><br>
+      <%= link_to "View Details", order_path(order) %>
+    </div>
+  <% end %>
+<% else %>
+  <p>You have no past orders.</p>
+<% end %>

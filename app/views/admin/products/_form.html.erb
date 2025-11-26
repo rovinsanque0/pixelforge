@@ -32,5 +32,11 @@
     <%= f.collection_select :category_id, Category.all, :id, :name %>
   </div>
 
+  <div class="mb-3">
+  <%= form.label :image %>
+  <%= form.file_field :image, class: "form-control" %>
+</div>
+
+
   <%= f.submit %>
 <% end %>

@@ -1,25 +1,25 @@
-<h1>PixelForge PC Supply</h1>
+<div class="container">
+  <h1 class="mb-4">Products</h1>
 
-<%= form_with url: products_path, method: :get, local: true do |f| %>
-  <div>
-    <%= f.label :q, "Search" %>
-    <%= f.text_field :q, value: @query %>
+  <div class="row">
+    <% @products.each do |product| %>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+
+          <% if product.image&.attached? %>
+            <%= image_tag product.image, class: "card-img-top" %>
+          <% end %>
+
+          <div class="card-body">
+            <h5 class="card-title"><%= product.name %></h5>
+            <p class="card-text"><%= truncate(product.description, length: 100) %></p>
+            <p class="fw-bold">$<%= product.price %></p>
+
+            <%= link_to "View", product_path(product), class: "btn btn-primary" %>
+          </div>
+
+        </div>
+      </div>
+    <% end %>
   </div>
-
-  <div>
-    <%= f.label :category_id, "Category" %>
-    <%= f.select :category_id,
-                 options_from_collection_for_select(@categories, :id, :name, @selected_category_id),
-                 include_blank: "All Categories" %>
-  </div>
-
-  <%= f.submit "Search" %>
-<% end %>
-
-<div class="products-grid">
-  <% @products.each do |product| %>
-    <%= render "product", product: product %>
-  <% end %>
 </div>
-
-<%= paginate @products %>

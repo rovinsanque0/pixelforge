@@ -1,0 +1,18 @@
+<%= form_with model: [:admin, @category] do |f| %>
+
+  <% if @category.errors.any? %>
+    <ul>
+      <% @category.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <p>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </p>
+
+  <%= f.submit %>
+
+<% end %>

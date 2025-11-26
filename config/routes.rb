@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
-  get "orders/new"
-  get "orders/show"
-  get "carts/show"
-  get "products/index"
-  get "products/show"
+  # get "orders/new"
+  # get "orders/show"
+  # get "carts/show"
+  # get "products/index"
+  # get "products/show"
   devise_for :users
 
   namespace :admin do
@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   root "products#index" # 2.1 front page
 
   resources :products, only: %i[index show]
+  resources :orders, only: %i[new create show index]
 
   resource :cart, only: [:show] do
     post :add_item
