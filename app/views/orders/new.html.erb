@@ -1,0 +1,23 @@
+<h1>Checkout</h1>
+
+<h2>Order Summary</h2>
+<ul>
+  <% Product.where(id: @cart.keys).each do |product| %>
+    <% qty = @cart[product.id.to_s].to_i %>
+    <li>
+      <%= product.name %> x <%= qty %> =
+      <%= number_to_currency(product.price * qty) %>
+    </li>
+  <% end %>
+</ul>
+
+<%= form_with model: @order, local: true do |f| %>
+  <% unless user_signed_in? && current_user.province.present? %>
+    <div>
+      <%= f.label :province_id, "Province" %>
+      <%= f.collection_select :province_id, Province.all, :id, :name %>
+    </div>
+  <% end %>
+
+  <%= f.submit "Place Order" %>
+<% end %>
