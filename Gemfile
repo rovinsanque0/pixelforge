@@ -55,3 +55,13 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Authentication
+gem "devise"
+
+# Pagination
+gem "kaminari"
+
+# Stripe later (for 3.3.1 if you go for it)
+gem "stripe"
+
