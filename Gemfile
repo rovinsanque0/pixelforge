@@ -65,3 +65,5 @@ gem "kaminari"
 # Stripe later (for 3.3.1 if you go for it)
 gem "stripe"
 
+gem "faker"
+
