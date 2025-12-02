@@ -35,6 +35,9 @@
           <li class="nav-item"><%= link_to "Dashboard", admin_root_path, class: "nav-link" %></li>
           <li class="nav-item"><%= link_to "Products", admin_products_path, class: "nav-link" %></li>
           <li class="nav-item"><%= link_to "Categories", admin_categories_path, class: "nav-link" %></li>
+          <li class="nav-item"><%= link_to "Edit About Page", edit_admin_page_path(Page.find_by(slug: "about")), class: "nav-link" %></li>
+          <li class="nav-item"><%= link_to "Edit Contact Page", edit_admin_page_path(Page.find_by(slug: "contact")), class: "nav-link" %></li>
+
         </ul>
 
         <ul class="navbar-nav ms-auto">

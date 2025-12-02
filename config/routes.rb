@@ -14,8 +14,10 @@ Rails.application.routes.draw do
 
     resources :pages, only: [:edit, :update] 
   end
-  get "/about", to: "pages#about"
-  get "/contact", to: "pages#contact"
+  get "/about", to: "pages#about", as: :about
+  get "/contact", to: "pages#contact", as: :contact
+
+
 
 
 

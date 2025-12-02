@@ -31,10 +31,24 @@
       <div class="collapse navbar-collapse" id="navbarNav">
 
         <!-- LEFT SIDE NAV -->
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item"><%= link_to "Products", products_path, class: "nav-link" %></li>
-          <li class="nav-item"><%= link_to "Cart (#{session[:cart]&.values&.sum || 0})", cart_path, class: "nav-link" %></li>
-        </ul>
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <%= link_to "Products", products_path, class: "nav-link" %>
+        </li>
+
+        <li class="nav-item">
+          <%= link_to "Cart (#{session[:cart]&.values&.sum || 0})", cart_path, class: "nav-link" %>
+        </li>
+
+        <li class="nav-item">
+          <%= link_to "About", about_path, class: "nav-link" %>
+        </li>
+
+        <li class="nav-item">
+          <%= link_to "Contact", contact_path, class: "nav-link" %>
+        </li>
+      </ul>
+
 
         <!-- SEARCH BAR -->
         <%= form_with url: products_path, method: :get, local: true, class: "d-flex me-3" do %>
