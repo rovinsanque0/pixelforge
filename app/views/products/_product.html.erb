@@ -1,4 +1,19 @@
 <div class="product-card">
   <h3><%= link_to product.name, product_path(product) %></h3>
-  <p><%= number_to_currency(product.price) %></p>
+
+  <% if product.on_sale? && product.sale_price.present? %>
+    <p>
+      <span class="text-muted text-decoration-line-through">
+        <%= number_to_currency(product.original_price) %>
+      </span>
+
+      <span class="fw-bold text-danger ms-2">
+        <%= number_to_currency(product.sale_price) %>
+      </span>
+    </p>
+  <% else %>
+    <p class="fw-bold">
+      <%= number_to_currency(product.original_price) %>
+    </p>
+  <% end %>
 </div>

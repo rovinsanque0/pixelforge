@@ -7,6 +7,7 @@ class Product < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :price, numericality: { greater_than_or_equal_to: 0 }
+  validates :original_price, numericality: { greater_than_or_equal_to: 0 }
+  validates :sale_price, numericality: true, allow_nil: true
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 end

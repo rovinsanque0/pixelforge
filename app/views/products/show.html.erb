@@ -10,7 +10,23 @@
     <div class="col-md-6">
       <h2><%= @product.name %></h2>
       <p><%= @product.description %></p>
-      <p class="fw-bold fs-4">$<%= @product.price %></p>
+
+     
+      <% if @product.on_sale? && @product.sale_price.present? %>
+        <p class="fs-4 mt-3">
+          <span class="text-muted text-decoration-line-through">
+            <%= number_to_currency(@product.original_price) %>
+          </span>
+
+          <span class="fw-bold text-danger ms-2">
+            <%= number_to_currency(@product.sale_price) %>
+          </span>
+        </p>
+      <% else %>
+        <p class="fs-4 fw-bold mt-3">
+          <%= number_to_currency(@product.original_price) %>
+        </p>
+      <% end %>
 
       <%= form_with url: add_item_cart_path, method: :post, local: true do %>
         <%= hidden_field_tag :product_id, @product.id %>

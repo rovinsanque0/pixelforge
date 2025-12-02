@@ -18,12 +18,41 @@ rescue => e
   puts "Image failed for #{product.name}: #{e.message}"
 end
 
+# Universal pricing generator
+def generate_pricing(min_price, max_price)
+  min_price = min_price.to_i
+  max_price = max_price.to_i
 
+  # Prevent invalid ranges
+  max_price = min_price + 1 if max_price <= min_price
+
+  # Generate valid original price
+  original = rand(min_price..max_price)
+
+  # Randomly decide sale
+  on_sale = [true, false].sample
+
+  if on_sale
+    # Discount = between 10 and maximum 30% OR at least 10 minimum
+    max_discount = [(original * 0.3).to_i, 10].max
+    discount = rand(10..max_discount)
+    sale = original - discount
+  else
+    sale = nil
+  end
+
+  [original, sale, on_sale]
+end
+
+
+# ------------------------------------
 # Categories
-gpu_category = Category.find_or_create_by!(name: "Graphics Cards")
-cpu_category = Category.find_or_create_by!(name: "CPUs")
+# ------------------------------------
+
+gpu_category        = Category.find_or_create_by!(name: "Graphics Cards")
+cpu_category        = Category.find_or_create_by!(name: "CPUs")
 peripheral_category = Category.find_or_create_by!(name: "Peripherals")
-storage_category = Category.find_or_create_by!(name: "Storage")
+storage_category    = Category.find_or_create_by!(name: "Storage")
 
 # ------------------------------------
 # GPUs (CSV)
@@ -36,6 +65,7 @@ count = 0
 
 CSV.foreach(gpu_csv_path, headers: true) do |row|
   name = row["Name"]
+
   description = <<~DESC
     Architecture: #{row["Architecture"]}
     Memory: #{row["Memory"]}
@@ -49,12 +79,14 @@ CSV.foreach(gpu_csv_path, headers: true) do |row|
     Release Date: #{row["Release_Date"]}
   DESC
 
-  price = row["Release_Price"].present? ? row["Release_Price"].to_f : rand(99..399)
+  original_price, sale_price, on_sale = generate_pricing(150, 600)
 
   p = Product.create!(
     name: name,
     description: description.strip,
-    price: price,
+    original_price: original_price,
+    sale_price: sale_price,
+    on_sale: on_sale,
     stock: rand(2..15),
     category: gpu_category
   )
@@ -66,7 +98,6 @@ CSV.foreach(gpu_csv_path, headers: true) do |row|
 end
 
 puts " Imported #{count} GPUs!"
-
 
 # ------------------------------------
 # CPUs (Faker)
@@ -93,10 +124,14 @@ puts "Seeding CPU products..."
     Socket: #{["AM4", "AM5", "LGA1151", "LGA1700"].sample}
   DESC
 
+  original_price, sale_price, on_sale = generate_pricing(200, 900)
+
   p = Product.create!(
     name: cpu_name,
     description: description,
-    price: rand(149..799),
+    original_price: original_price,
+    sale_price: sale_price,
+    on_sale: on_sale,
     stock: rand(5..20),
     category: cpu_category
   )
@@ -105,7 +140,6 @@ puts "Seeding CPU products..."
 end
 
 puts " Seeded CPUs!"
-
 
 # ------------------------------------
 # Peripherals
@@ -137,14 +171,16 @@ brands = [
   model_code = "#{('A'..'Z').to_a.sample}#{rand(50..999)}"
 
   name = "#{brand} #{model_code} #{item}"
-
-  # short description (kept simple)
   description = "#{item} by #{brand}. Model #{model_code}."
+
+  original_price, sale_price, on_sale = generate_pricing(20, 200)
 
   p = Product.create!(
     name: name,
     description: description,
-    price: rand(29..499),
+    original_price: original_price,
+    sale_price: sale_price,
+    on_sale: on_sale,
     stock: rand(5..30),
     category: peripheral_category
   )
@@ -164,7 +200,6 @@ end
 
 puts " Seeded Peripherals!"
 
-
 # ------------------------------------
 # Static Pages
 # ------------------------------------
@@ -182,7 +217,6 @@ Page.find_or_create_by!(slug: "contact") do |page|
 end
 
 puts " Static pages created."
-
 
 # ------------------------------------
 # Storage
@@ -203,13 +237,16 @@ storage_types = [
   capacity = ["250GB", "500GB", "1TB", "2TB", "4TB"].sample
 
   name = "#{brand} #{capacity} #{type}"
-
   description = "#{capacity} #{type} storage device."
+
+  original_price, sale_price, on_sale = generate_pricing(40, 300)
 
   p = Product.create!(
     name: name,
     description: description,
-    price: rand(49..299),
+    original_price: original_price,
+    sale_price: sale_price,
+    on_sale: on_sale,
     stock: rand(5..25),
     category: storage_category
   )

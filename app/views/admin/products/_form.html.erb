@@ -18,9 +18,20 @@
   </div>
 
   <div>
-    <%= f.label :price %><br>
-    <%= f.number_field :price, step: 0.01 %>
+    <%= f.label :original_price, "Original Price" %><br>
+    <%= f.number_field :original_price, step: 0.01 %>
   </div>
+
+  <div>
+    <%= f.label :sale_price, "Sale Price (Optional)" %><br>
+    <%= f.number_field :sale_price, step: 0.01 %>
+  </div>
+
+  <div>
+    <%= f.label :on_sale, "On Sale?" %><br>
+    <%= f.check_box :on_sale %>
+  </div>
+
 
   <div>
     <%= f.label :stock %><br>

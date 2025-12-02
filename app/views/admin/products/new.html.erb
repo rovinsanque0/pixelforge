@@ -14,9 +14,20 @@
     </div>
 
     <div class="mb-3">
-      <%= f.label :price, class: "form-label" %>
-      <%= f.number_field :price, step: 0.01, class: "form-control" %>
+      <%= f.label :original_price, "Original Price", class: "form-label" %>
+      <%= f.number_field :original_price, step: 0.01, class: "form-control" %>
     </div>
+
+    <div class="mb-3">
+      <%= f.label :sale_price, "Sale Price (optional)", class: "form-label" %>
+      <%= f.number_field :sale_price, step: 0.01, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :on_sale, "On Sale?", class: "form-label" %>
+      <%= f.check_box :on_sale %>
+    </div>
+
 
     <div class="mb-3">
       <%= f.label :stock, class: "form-label" %>

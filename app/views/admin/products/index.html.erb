@@ -14,7 +14,21 @@
   <% @products.each do |product| %>
     <tr>
       <td><%= product.name %></td>
-      <td><%= number_to_currency(product.price) %></td>
+
+      <!-- FIXED PRICE DISPLAY -->
+      <td>
+        <% if product.on_sale? && product.sale_price.present? %>
+          <span style="text-decoration: line-through; color: gray;">
+            <%= number_to_currency(product.original_price) %>
+          </span>
+          <span style="color: red; font-weight: bold;">
+            <%= number_to_currency(product.sale_price) %>
+          </span>
+        <% else %>
+          <%= number_to_currency(product.original_price) %>
+        <% end %>
+      </td>
+
       <td><%= product.stock %></td>
       <td><%= product.category&.name %></td>
       <td>
