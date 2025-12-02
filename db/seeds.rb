@@ -3,19 +3,35 @@
 # ------------------------------------
 
 require "csv"
+require "open-uri"
 
-#gpu
-gpu_csv_path = Rails.root.join("db/csv/gpus.csv")
+def attach_remote_image(product, keyword)
+  url = "https://picsum.photos/seed/#{keyword + rand(1000).to_s}/600/400"
+  file = URI.open(url)
+
+  product.image.attach(
+    io: file,
+    filename: "#{keyword}.jpg",
+    content_type: "image/jpeg"
+  )
+rescue => e
+  puts "Image failed for #{product.name}: #{e.message}"
+end
+
+
+# Categories
 gpu_category = Category.find_or_create_by!(name: "Graphics Cards")
-
-#cpu
 cpu_category = Category.find_or_create_by!(name: "CPUs")
-
-#peripherals
 peripheral_category = Category.find_or_create_by!(name: "Peripherals")
+storage_category = Category.find_or_create_by!(name: "Storage")
+
+# ------------------------------------
+# GPUs (CSV)
+# ------------------------------------
 
 puts "Importing GPUs from CSV..."
 
+gpu_csv_path = Rails.root.join("db/csv/gpus.csv")
 count = 0
 
 CSV.foreach(gpu_csv_path, headers: true) do |row|
@@ -34,26 +50,26 @@ CSV.foreach(gpu_csv_path, headers: true) do |row|
   DESC
 
   price = row["Release_Price"].present? ? row["Release_Price"].to_f : rand(99..399)
-  stock = rand(2..15)
 
-  Product.create!(
+  p = Product.create!(
     name: name,
     description: description.strip,
     price: price,
-    stock: stock,
+    stock: rand(2..15),
     category: gpu_category
   )
 
+  attach_remote_image(p, "graphics-card")
+
   count += 1
-  break if count >= 20   # limit to 20 products to avoid over-seeding
+  break if count >= 20
 end
 
-puts " Imported #{count} GPUs from CSV!"
-
+puts " Imported #{count} GPUs!"
 
 
 # ------------------------------------
-# CPU Products (Faker)
+# CPUs (Faker)
 # ------------------------------------
 
 puts "Seeding CPU products..."
@@ -68,37 +84,31 @@ puts "Seeding CPU products..."
     "AMD Ryzen 9 #{rand(3900..7950)}"
   ].sample
 
-  cores = [4, 6, 8, 12, 16].sample
-  threads = cores * 2
-  base_clock = rand(2.5..4.0).round(2)
-  boost_clock = rand(4.0..5.7).round(2)
-  tdp = [65, 105, 125, 170].sample
-
   description = <<~DESC
-    Cores: #{cores}
-    Threads: #{threads}
-    Base Clock: #{base_clock} GHz
-    Boost Clock: #{boost_clock} GHz
-    TDP: #{tdp}W
+    Cores: #{rand(4..16)}
+    Threads: #{rand(8..32)}
+    Base Clock: #{rand(2.5..4.0).round(2)} GHz
+    Boost Clock: #{rand(4.0..5.7).round(2)} GHz
+    TDP: #{[65, 105, 125, 170].sample}W
     Socket: #{["AM4", "AM5", "LGA1151", "LGA1700"].sample}
   DESC
 
-  Product.create!(
+  p = Product.create!(
     name: cpu_name,
     description: description,
     price: rand(149..799),
     stock: rand(5..20),
     category: cpu_category
   )
+
+  attach_remote_image(p, "cpu")
 end
 
 puts " Seeded CPUs!"
 
 
-
-
 # ------------------------------------
-# Peripheral Products (Faker)
+# Peripherals
 # ------------------------------------
 
 puts "Seeding Peripheral products..."
@@ -117,94 +127,47 @@ peripheral_items = [
 ]
 
 brands = [
-  "Logitech",
-  "Corsair",
-  "Razer",
-  "SteelSeries",
-  "HyperX",
-  "ASUS",
-  "MSI",
-  "Acer",
-  "BenQ",
-  "Elgato"
+  "Logitech", "Corsair", "Razer", "SteelSeries", "HyperX",
+  "ASUS", "MSI", "Acer", "BenQ", "Elgato"
 ]
 
 20.times do
-  item  = peripheral_items.sample
+  item = peripheral_items.sample
   brand = brands.sample
-
-  # Simple fake model code like "K65", "G502", etc.
   model_code = "#{('A'..'Z').to_a.sample}#{rand(50..999)}"
 
-  name = case item
-         when "Mechanical Keyboard"
-           "#{brand} #{model_code} Mechanical Keyboard"
-         when "Gaming Mouse"
-           "#{brand} #{model_code} Gaming Mouse"
-         when /Monitor/
-           "#{brand} #{model_code} #{item}"
-         when "Gaming Headset"
-           "#{brand} #{model_code} Gaming Headset"
-         when "USB Microphone"
-           "#{brand} #{model_code} USB Microphone"
-         when /Webcam/
-           "#{brand} #{model_code} #{item}"
-         else
-           "#{brand} #{model_code} #{item}"
-         end
+  name = "#{brand} #{model_code} #{item}"
 
-  description = case item
-                when "Mechanical Keyboard"
-                  <<~DESC
-                    Switch Type: #{["Red", "Blue", "Brown"].sample}
-                    Backlight: #{["RGB", "White", "None"].sample}
-                    Connectivity: #{["USB-C Wired", "Wireless 2.4GHz"].sample}
-                  DESC
-                when "Gaming Mouse"
-                  <<~DESC
-                    DPI: #{rand(400..26_000)}
-                    Buttons: #{rand(5..12)}
-                    Weight: #{rand(60..120)}g
-                  DESC
-                when /Monitor/
-                  <<~DESC
-                    Resolution: #{item}
-                    Refresh Rate: #{[60, 75, 120, 144, 240].sample}Hz
-                    Panel Type: #{["IPS", "VA", "TN"].sample}
-                  DESC
-                when "Gaming Headset"
-                  <<~DESC
-                    Driver Size: #{rand(40..53)}mm
-                    Surround: #{["Stereo", "Virtual 7.1"].sample}
-                    Microphone: #{["Detachable", "Flip-to-mute"].sample}
-                  DESC
-                when "USB Microphone"
-                  <<~DESC
-                    Polar Pattern: #{["Cardioid", "Omnidirectional", "Bidirectional"].sample}
-                    Sample Rate: #{[44_100, 48_000].sample} Hz
-                    Connectivity: USB
-                  DESC
-                when /Webcam/
-                  <<~DESC
-                    Resolution: #{item.include?("4K") ? "3840x2160" : "1920x1080"}
-                    Frame Rate: #{[30, 60].sample} FPS
-                    Field of View: #{[78, 90, 110].sample}°
-                  DESC
-                else
-                  Faker::Lorem.paragraph(sentence_count: 3)
-                end
+  # short description (kept simple)
+  description = "#{item} by #{brand}. Model #{model_code}."
 
-  Product.create!(
-    name:        name,
+  p = Product.create!(
+    name: name,
     description: description,
-    price:       rand(29..499),
-    stock:       rand(5..30),
-    category:    peripheral_category
+    price: rand(29..499),
+    stock: rand(5..30),
+    category: peripheral_category
   )
+
+  keyword = case item
+            when "Mechanical Keyboard" then "keyboard"
+            when "Gaming Mouse" then "mouse"
+            when /Monitor/ then "monitor"
+            when "Gaming Headset" then "headset"
+            when "USB Microphone" then "microphone"
+            when /Webcam/ then "webcam"
+            else "computer-accessory"
+            end
+
+  attach_remote_image(p, keyword)
 end
 
 puts " Seeded Peripherals!"
 
+
+# ------------------------------------
+# Static Pages
+# ------------------------------------
 
 puts "Creating editable static pages..."
 
@@ -221,4 +184,38 @@ end
 puts " Static pages created."
 
 
+# ------------------------------------
+# Storage
+# ------------------------------------
 
+puts "Seeding Storage products..."
+
+storage_types = [
+  "SATA SSD",
+  "NVMe SSD",
+  "External HDD",
+  "Internal HDD"
+]
+
+20.times do
+  type = storage_types.sample
+  brand = ["Samsung", "Western Digital", "Seagate", "Crucial", "Kingston"].sample
+  capacity = ["250GB", "500GB", "1TB", "2TB", "4TB"].sample
+
+  name = "#{brand} #{capacity} #{type}"
+
+  description = "#{capacity} #{type} storage device."
+
+  p = Product.create!(
+    name: name,
+    description: description,
+    price: rand(49..299),
+    stock: rand(5..25),
+    category: storage_category
+  )
+
+  keyword = type.include?("SSD") ? "ssd" : "hdd"
+  attach_remote_image(p, keyword)
+end
+
+puts " Seeded Storage!"

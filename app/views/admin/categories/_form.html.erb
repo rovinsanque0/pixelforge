@@ -1,18 +1,8 @@
-<%= form_with model: [:admin, @category] do |f| %>
+<%= form_with model: [:admin, category], local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :name, class: "form-label fw-bold" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
 
-  <% if @category.errors.any? %>
-    <ul>
-      <% @category.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  <% end %>
-
-  <p>
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </p>
-
-  <%= f.submit %>
-
+  <%= f.submit class: "btn btn-success" %>
 <% end %>
