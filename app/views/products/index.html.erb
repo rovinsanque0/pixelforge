@@ -1,13 +1,39 @@
-<div class="container">
+<div class="container mt-4">
+
   <h1 class="mb-4 fw-bold text-center">Products</h1>
 
+  <!-- Search + Filter Row -->
+  <div class="row mb-4">
+
+    <!-- Search -->
+    <div class="col-md-8">
+      <%= form_with url: products_path, method: :get, local: true, class: "d-flex gap-2" do %>
+        <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search products..." %>
+        <%= submit_tag "Search", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="col-md-4">
+      <%= form_with url: products_path, method: :get, local: true do %>
+        <%= select_tag :category_id,
+              options_from_collection_for_select(@categories, :id, :name, @selected_category_id),
+              include_blank: "All Categories",
+              class: "form-select",
+              onchange: "this.form.submit();" %>
+      <% end %>
+    </div>
+
+  </div>
+
+  <!-- Products Grid -->
   <div class="row g-4">
     <% @products.each do |product| %>
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="card product-card h-100 shadow-sm border-0">
 
           <% if product.image&.attached? %>
-            <%= image_tag product.image, class: "card-img-top product-image" %>
+            <%= image_tag product.image, class: "card-img-top product-image", style: "object-fit: cover; height: 200px;" %>
           <% else %>
             <div class="placeholder bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
               No Image
@@ -29,9 +55,8 @@
   </div>
 
   <!-- Pagination -->
-<div class="d-flex justify-content-center mt-4">
-  <%= paginate @products %>
-</div>
-
+  <div class="d-flex justify-content-center mt-4">
+    <%= paginate @products %>
+  </div>
 
 </div>

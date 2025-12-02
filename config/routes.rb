@@ -11,7 +11,13 @@ Rails.application.routes.draw do
     root "dashboard#index"
     resources :products
     resources :categories
+
+    resources :pages, only: [:edit, :update] 
   end
+  get "/about", to: "pages#about"
+  get "/contact", to: "pages#contact"
+
+
 
   root "products#index" # 2.1 front page
 
