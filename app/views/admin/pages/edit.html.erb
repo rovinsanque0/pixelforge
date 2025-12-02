@@ -1,0 +1,18 @@
+<div class="container mt-4">
+  <h1>Edit <%= @page.title %></h1>
+
+  <%= form_with(model: [:admin, @page], local: true, class: "mt-3") do |form| %>
+    
+    <div class="mb-3">
+      <%= form.label :title, class: "form-label" %>
+      <%= form.text_field :title, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :content, class: "form-label" %>
+      <%= form.text_area :content, rows: 10, class: "form-control" %>
+    </div>
+
+    <%= form.submit "Update Page", class: "btn btn-primary" %>
+  <% end %>
+</div>

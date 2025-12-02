@@ -203,9 +203,22 @@ brands = [
   )
 end
 
-puts "✓ Seeded Peripherals!"
+puts " Seeded Peripherals!"
 
 
+puts "Creating editable static pages..."
+
+Page.find_or_create_by!(slug: "about") do |page|
+  page.title = "About Us"
+  page.content = "Write something about your store here."
+end
+
+Page.find_or_create_by!(slug: "contact") do |page|
+  page.title = "Contact Us"
+  page.content = "You can contact us using the form below or email support@example.com."
+end
+
+puts " Static pages created."
 
 
 
