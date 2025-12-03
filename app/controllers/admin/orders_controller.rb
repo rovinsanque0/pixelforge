@@ -6,16 +6,16 @@ class Admin::OrdersController < ApplicationController
     @orders = Order.includes(:user, :order_items, :province).order(created_at: :desc)
   end
 
-  def update_status
+  def toggle_shipping
     @order = Order.find(params[:id])
-    new_status = params[:status]
 
-    if ["new", "paid", "shipped"].include?(new_status)
-      @order.update(status: new_status)
-      redirect_to admin_orders_path, notice: "Order ##{@order.id} marked as #{new_status.capitalize}."
-    else
-      redirect_to admin_orders_path, alert: "Invalid status."
+    if @order.status == "paid"
+      @order.update(status: "paid-shipped")
+    elsif @order.status == "paid-shipped"
+      @order.update(status: "paid")
     end
+
+    redirect_to admin_orders_path, notice: "Order status updated."
   end
 
   private

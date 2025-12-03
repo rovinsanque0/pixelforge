@@ -17,6 +17,7 @@
       <th>Email</th>
       <th>Date</th>
       <th>Status</th>
+      <th>Update</th>
       <th>Subtotal</th>
       <th>Taxes</th>
       <th>Total</th>
@@ -41,16 +42,39 @@
 
         <!-- Status Badge -->
         <td>
+          <% status_text =
+                case order.status
+                when "new"
+                  "New"
+                when "paid"
+                  "Paid — Pending Shipping"
+                when "paid-shipped"
+                  "Paid — Shipped"
+                when "shipped"
+                  "Shipped"
+                else
+                  order.status.capitalize
+                end %>
+
           <% badge =
-              case order.status
-              when "paid"    then "bg-success"
-              when "shipped" then "bg-primary"
-              else "bg-warning text-dark"
-              end %>
+                case order.status
+                when "paid-shipped" then "bg-primary"
+                when "paid"         then "bg-success"
+                when "new"          then "bg-secondary"
+                else "bg-dark"
+                end %>
 
           <span class="badge <%= badge %>">
-            <%= order.status.capitalize %>
+            <%= status_text %>
           </span>
+        </td>
+
+        <!-- Update Button -->
+        <td>
+          <%= button_to "Toggle Shipping",
+                toggle_shipping_admin_order_path(order),
+                method: :patch,
+                class: "btn btn-sm btn-outline-primary" %>
         </td>
 
         <!-- Subtotal -->
@@ -58,9 +82,9 @@
 
         <!-- Taxes -->
         <td>
-          <div><strong>GST:</strong> <%= number_to_currency(order.gst_amount) %></div>
-          <div><strong>PST:</strong> <%= number_to_currency(order.pst_amount) %></div>
-          <div><strong>HST:</strong> <%= number_to_currency(order.hst_amount) %></div>
+          <strong>GST:</strong> <%= number_to_currency(order.gst_amount) %><br>
+          <strong>PST:</strong> <%= number_to_currency(order.pst_amount) %><br>
+          <strong>HST:</strong> <%= number_to_currency(order.hst_amount) %>
         </td>
 
         <!-- Total -->
@@ -68,7 +92,7 @@
           <%= number_to_currency(order.total) %>
         </td>
 
-        <!-- Product List (Collapsible) -->
+        <!-- Products (Collapsible List) -->
         <td style="width: 260px;">
           <button class="btn btn-sm btn-outline-secondary"
                   type="button"

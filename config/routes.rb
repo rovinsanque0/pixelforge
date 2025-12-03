@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
     resources :orders, only: [:index] do
       member do
-        patch :update_status
+        patch :toggle_shipping
       end
     end
   end
@@ -35,3 +35,6 @@ Rails.application.routes.draw do
     delete :remove_item
   end
 end
+
+
+
