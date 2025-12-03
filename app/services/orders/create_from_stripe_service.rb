@@ -1,27 +1,31 @@
 class Orders::CreateFromStripeService
-  def initialize(user, cart)
+  def initialize(user, cart, session_data)
     @user = user
     @cart = cart
+    @session_data = session_data
   end
 
   def call
-    province = @user.province
+    province = Province.find(@session_data[:checkout_province_id])
+
     subtotal = calculate_subtotal
-    gst      = subtotal * province.gst
-    pst      = subtotal * province.pst
-    hst      = subtotal * province.hst
-    total    = subtotal + gst + pst + hst
+    gst = subtotal * province.gst
+    pst = subtotal * province.pst
+    hst = subtotal * province.hst
+    total = subtotal + gst + pst + hst
 
     order = Order.create!(
       user: @user,
       province: province,
+      address: @session_data[:checkout_address],
+      city: @session_data[:checkout_city],
+      postal_code: @session_data[:checkout_postal_code],
       status: "paid",
       subtotal: subtotal,
       gst_amount: gst,
       pst_amount: pst,
       hst_amount: hst,
-      total: total,
-      stripe_payment_id: SecureRandom.hex(10)
+      total: total
     )
 
     @cart.each do |pid, qty|
@@ -35,6 +39,8 @@ class Orders::CreateFromStripeService
 
     order
   end
+
+  private
 
   def calculate_subtotal
     @cart.sum do |pid, qty|
