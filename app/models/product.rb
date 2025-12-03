@@ -10,4 +10,13 @@ class Product < ApplicationRecord
   validates :original_price, numericality: { greater_than_or_equal_to: 0 }
   validates :sale_price, numericality: true, allow_nil: true
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+  # Returns correct price (sale or regular)
+  def display_price
+    if on_sale? && sale_price.present?
+      sale_price
+    else
+      original_price
+    end
+  end
 end

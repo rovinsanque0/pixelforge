@@ -3,7 +3,7 @@
 <% if @cart_items.empty? %>
   <p>Your cart is empty.</p>
 <% else %>
-  <table>
+  <table class="table">
     <thead>
       <tr>
         <th>Product</th>
@@ -20,20 +20,48 @@
           <td>
             <%= form_with url: update_item_cart_path, method: :patch, local: true do |f| %>
               <%= hidden_field_tag :product_id, product.id %>
-              <%= number_field_tag :quantity, qty, min: 0 %>
-              <%= f.submit "Update" %>
+              <%= number_field_tag :quantity, qty, min: 0, class: "form-control" %>
+              <%= f.submit "Update", class: "btn btn-sm btn-secondary mt-1" %>
             <% end %>
           </td>
-          <td><%= number_to_currency(product.price) %></td>
-          <td><%= number_to_currency(product.price * qty) %></td>
+
+          <td><%= number_to_currency(product.display_price) %></td>
+
+          <td><%= number_to_currency(product.display_price * qty) %></td>
+
           <td>
-            <%= button_to "Remove", remove_item_cart_path(product_id: product.id),
-                          method: :delete %>
+            <%= button_to "Remove",
+               remove_item_cart_path(product_id: product.id),
+               method: :delete,
+               class: "btn btn-sm btn-danger" %>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
 
-  <%= link_to "Proceed to Checkout", new_order_path, class: "button" %>
+  <!-- Province selection & tax preview -->
+  <div class="mt-4 p-3 border rounded bg-light">
+    <h4>Select Province for Taxes</h4>
+
+    <%= form_with url: cart_path, method: :get, local: true do %>
+      <%= select_tag :province_id,
+            options_from_collection_for_select(Province.all, :id, :name, params[:province_id]),
+            include_blank: "Choose Province",
+            class: "form-select w-25" %>
+
+      <%= submit_tag "Update Taxes", class: "btn btn-primary mt-2" %>
+    <% end %>
+
+    <% if @selected_province %>
+      <hr>
+      <p>Subtotal: <%= number_to_currency(@subtotal) %></p>
+      <p>GST: <%= number_to_currency(@gst_amount) %></p>
+      <p>PST: <%= number_to_currency(@pst_amount) %></p>
+      <p>HST: <%= number_to_currency(@hst_amount) %></p>
+      <p class="fw-bold">Total: <%= number_to_currency(@total) %></p>
+    <% end %>
+  </div>
+
+  <%= link_to "Proceed to Checkout", new_order_path, class: "btn btn-success mt-3" %>
 <% end %>
