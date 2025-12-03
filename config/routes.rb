@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   end
   get "/about", to: "pages#about", as: :about
   get "/contact", to: "pages#contact", as: :contact
+  post "/contact_submit", to: "pages#contact_submit", as: :contact_submit
 
 
 

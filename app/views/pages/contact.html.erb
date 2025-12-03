@@ -1,4 +1,28 @@
 <div class="container py-4">
-  <h1 class="fw-bold mb-3">About</h1>
+  <h1 class="fw-bold mb-3"><%= @page.title.presence || "Contact Us" %></h1>
   <%= simple_format @page.content %>
+
+  <hr class="my-4">
+
+  <h3>Send Us a Message</h3>
+
+  <%= form_with url: contact_submit_path, method: :post, local: true, class: "mt-3" do %>
+    <div class="mb-3">
+      <%= label_tag :name, "Your Name", class: "form-label" %>
+      <%= text_field_tag :name, nil, class: "form-control", required: true %>
+    </div>
+
+    <div class="mb-3">
+      <%= label_tag :email, "Your Email", class: "form-label" %>
+      <%= email_field_tag :email, nil, class: "form-control", required: true %>
+    </div>
+
+    <div class="mb-3">
+      <%= label_tag :message, "Message", class: "form-label" %>
+      <%= text_area_tag :message, nil, class: "form-control", rows: 5, required: true %>
+    </div>
+
+    <%= submit_tag "Send Message", class: "btn btn-primary" %>
+  <% end %>
 </div>
+`1`
