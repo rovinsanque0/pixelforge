@@ -1,7 +1,19 @@
 class CartsController < ApplicationController
+  before_action :authenticate_user!
   before_action :load_cart
 
-  def show; end
+  def show
+    # Province tax preview
+    if params[:province_id].present?
+      @selected_province = Province.find(params[:province_id])
+
+      @subtotal = calculate_subtotal
+      @gst_amount = @subtotal * @selected_province.gst
+      @pst_amount = @subtotal * @selected_province.pst
+      @hst_amount = @subtotal * @selected_province.hst
+      @total = @subtotal + @gst_amount + @pst_amount + @hst_amount
+    end
+  end
 
   def add_item
     product_id = params[:product_id].to_s
@@ -38,9 +50,17 @@ class CartsController < ApplicationController
   def load_cart
     session[:cart] ||= {}
     @cart = session[:cart]
+
     @cart_items = Product.where(id: @cart.keys).map do |product|
       qty = @cart[product.id.to_s]
       [product, qty]
+    end
+  end
+
+  def calculate_subtotal
+    @cart.sum do |pid, qty|
+      product = Product.find(pid)
+      product.display_price * qty.to_i
     end
   end
 

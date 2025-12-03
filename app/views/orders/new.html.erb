@@ -1,6 +1,7 @@
 <h1>Checkout</h1>
 
-<%= form_with model: @order, local: true do |f| %>
+<%= form_with model: @order, local: true, data: { turbo: false }, method: :post do |f| %>
+
   <div class="mb-3">
     <%= f.label :address %>
     <%= f.text_field :address, class: "form-control" %>
@@ -23,3 +24,74 @@
 
   <%= f.submit "Place Order", class: "btn btn-primary" %>
 <% end %>
+
+<hr>
+
+<h3>Order Summary</h3>
+
+<%# ---------- TAX & TOTAL CALCULATIONS ---------- %>
+<%
+  # Calculate subtotal
+  subtotal = @cart.sum do |product_id, qty|
+    product = Product.find(product_id)
+    product.display_price * qty
+  end
+
+  # Figure out which province applies
+  if params[:province_id].present?
+    province = Province.find(params[:province_id])
+  elsif current_user&.province
+    province = current_user.province
+  else
+    province = nil
+  end
+
+  # Calculate taxes
+  gst = province ? subtotal * province.gst : 0
+  pst = province ? subtotal * province.pst : 0
+  hst = province ? subtotal * province.hst : 0
+
+  total = subtotal + gst + pst + hst
+%>
+
+<%= form_with url: new_order_path, method: :get, local: true, id: "province-form" do %>
+  <%= label_tag :province_id, "Province" %>
+  <%= select_tag :province_id,
+        options_from_collection_for_select(@provinces, :id, :name, params[:province_id]),
+        class: "form-select",
+        onchange: "this.form.submit();" %>
+<% end %>
+
+
+<hr>
+
+<h3>Taxes & Total</h3>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Subtotal</th>
+      <td><%= number_to_currency(subtotal) %></td>
+    </tr>
+
+    <tr>
+      <th>GST (<%= province&.gst.to_f * 100 %>%)</th>
+      <td><%= number_to_currency(gst) %></td>
+    </tr>
+
+    <tr>
+      <th>PST (<%= province&.pst.to_f * 100 %>%)</th>
+      <td><%= number_to_currency(pst) %></td>
+    </tr>
+
+    <tr>
+      <th>HST (<%= province&.hst.to_f * 100 %>%)</th>
+      <td><%= number_to_currency(hst) %></td>
+    </tr>
+
+    <tr class="table-primary">
+      <th>Total</th>
+      <td><strong><%= number_to_currency(total) %></strong></td>
+    </tr>
+  </tbody>
+</table>

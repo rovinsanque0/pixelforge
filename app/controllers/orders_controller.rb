@@ -1,7 +1,8 @@
 class OrdersController < ApplicationController
-  before_action :load_cart
-  before_action :require_cart_not_empty
+  before_action :load_cart, only: [:new, :create]
+  before_action :require_cart_not_empty, only: [:new, :create]
   before_action :authenticate_user!
+
 
 
   def index
