@@ -4,10 +4,16 @@ Rails.application.routes.draw do
   namespace :admin do
     get "dashboard/index"
     root "dashboard#index"
+
     resources :products
     resources :categories
-    resources :pages, only: [:edit, :update] 
-     resources :orders, only: [:index]
+    resources :pages, only: [:edit, :update]
+
+    resources :orders, only: [:index] do
+      member do
+        patch :update_status
+      end
+    end
   end
 
   get "/about", to: "pages#about", as: :about
@@ -18,12 +24,9 @@ Rails.application.routes.draw do
   get "/order_success", to: "payments#order_success", as: :order_success
   get "/order_cancel", to: "payments#order_cancel", as: :order_cancel
 
-
   root "products#index"
 
   resources :products, only: %i[index show]
-
-
   resources :orders, only: %i[new create show index]
 
   resource :cart, only: [:show] do

@@ -1,0 +1,88 @@
+<h1 class="mb-4">All Customer Orders</h1>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <p class="text-muted mb-0">
+      Below is a complete list of all orders placed by all customers,
+      including taxes, totals, and product details.
+    </p>
+  </div>
+</div>
+
+<table class="table table-bordered table-hover align-middle">
+  <thead class="table-dark">
+    <tr>
+      <th>Order #</th>
+      <th>Customer</th>
+      <th>Email</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Subtotal</th>
+      <th>Taxes</th>
+      <th>Total</th>
+      <th>Products</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @orders.each do |order| %>
+      <tr>
+        <td><%= order.id %></td>
+
+        <td><%= order.user&.name || "N/A" %></td>
+
+        <td><%= order.user&.email %></td>
+
+        <td><%= order.created_at.strftime("%B %d, %Y") %></td>
+
+        <td>
+          <% badge_class =
+               case order.status
+               when "paid"   then "bg-success"
+               when "shipped" then "bg-primary"
+               else "bg-warning"
+               end %>
+
+          <span class="badge <%= badge_class %>">
+            <%= order.status.capitalize %>
+          </span>
+        </td>
+
+        <td><%= number_to_currency(order.subtotal) %></td>
+
+        <td>
+          <strong>GST:</strong> <%= number_to_currency(order.gst_amount) %><br>
+          <strong>PST:</strong> <%= number_to_currency(order.pst_amount) %><br>
+          <strong>HST:</strong> <%= number_to_currency(order.hst_amount) %>
+        </td>
+
+        <td class="fw-bold"><%= number_to_currency(order.total) %></td>
+
+        <!-- PRODUCTS DROPDOWN -->
+        <td style="width: 280px;">
+          <button class="btn btn-sm btn-outline-secondary"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#order-products-<%= order.id %>">
+            View Products
+          </button>
+
+          <div class="collapse mt-2" id="order-products-<%= order.id %>">
+            <ul class="list-group">
+              <% order.order_items.each do |item| %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong><%= item.product.name %></strong><br>
+                    Qty: <%= item.quantity %>
+                  </div>
+                  <span><%= number_to_currency(item.price_at_purchase * item.quantity) %></span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
