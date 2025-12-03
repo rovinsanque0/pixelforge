@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     resources :products
     resources :categories
     resources :pages, only: [:edit, :update] 
+     resources :orders, only: [:index]
   end
 
   get "/about", to: "pages#about", as: :about
@@ -22,7 +23,7 @@ Rails.application.routes.draw do
 
   resources :products, only: %i[index show]
 
-  # ✅ ONLY ONE orders resource
+
   resources :orders, only: %i[new create show index]
 
   resource :cart, only: [:show] do
