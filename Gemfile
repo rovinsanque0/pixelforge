@@ -66,4 +66,6 @@ gem "kaminari"
 gem "stripe"
 
 gem "faker"
+gem "sassc-rails"
+
 

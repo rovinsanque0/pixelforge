@@ -1,73 +1,110 @@
-<h1 class="mb-4">Order Confirmation</h1>
+<div class="container mt-4">
 
-<div class="card mb-4">
-  <div class="card-body">
-    <h4 class="card-title">Order #<%= @order.id %></h4>
-    <p class="mb-1"><strong>Status:</strong> <%= @order.status.capitalize %></p>
-    <p class="mb-1"><strong>Order Date:</strong> <%= @order.created_at.strftime("%B %d, %Y %I:%M %p") %></p>
+  <h1 class="fw-bold mb-4">Order Receipt</h1>
+
+  <!-- Order Header -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title">Order #<%= @order.id %></h4>
+
+      <p class="mb-1"><strong>Status:</strong>
+        <span class="badge 
+          <%= @order.status == "paid" ? "bg-success" : @order.status == "shipped" ? "bg-primary" : "bg-warning" %>">
+          <%= @order.status.capitalize %>
+        </span>
+      </p>
+
+      <% if @order.stripe_payment_id.present? %>
+        <p class="mb-1"><strong>Stripe Payment ID:</strong> <%= @order.stripe_payment_id %></p>
+      <% end %>
+
+      <p class="mb-1"><strong>Order Date:</strong> <%= @order.created_at.strftime("%B %d, %Y %I:%M %p") %></p>
+    </div>
   </div>
-</div>
 
-<h3>Shipping Information</h3>
-<div class="card mb-4">
-  <div class="card-body">
-    <p><strong>Address:</strong> <%= @order.address %></p>
-    <p><strong>City:</strong> <%= @order.city %></p>
-    <p><strong>Postal Code:</strong> <%= @order.postal_code %></p>
-    <p><strong>Province:</strong> <%= @order.province.name %></p>
+  <!-- Customer Details -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-3">Customer Information</h4>
+
+      <p><strong>Name:</strong> <%= @order.user.email %></p>
+
+      <p class="mb-0">
+        <strong>Shipping Address:</strong><br>
+        <%= @order.address %><br>
+        <%= @order.city %>, <%= @order.province.name %><br>
+        <%= @order.postal_code %>
+      </p>
+    </div>
   </div>
+
+  <!-- Order Items -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-3">Items</h4>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Price</th>
+            <th class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @order.order_items.each do |item| %>
+            <tr>
+              <td><%= item.product.name %></td>
+              <td class="text-center"><%= item.quantity %></td>
+              <td class="text-end"><%= number_to_currency(item.price_at_purchase) %></td>
+              <td class="text-end"><%= number_to_currency(item.price_at_purchase * item.quantity) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Totals Section -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-3">Totals</h4>
+
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Subtotal</th>
+            <td class="text-end"><%= number_to_currency(@order.subtotal) %></td>
+          </tr>
+
+          <tr>
+            <th>GST (<%= @order.province.gst * 100 %>%)</th>
+            <td class="text-end"><%= number_to_currency(@order.gst_amount) %></td>
+          </tr>
+
+          <tr>
+            <th>PST (<%= @order.province.pst * 100 %>%)</th>
+            <td class="text-end"><%= number_to_currency(@order.pst_amount) %></td>
+          </tr>
+
+          <tr>
+            <th>HST (<%= @order.province.hst * 100 %>%)</th>
+            <td class="text-end"><%= number_to_currency(@order.hst_amount) %></td>
+          </tr>
+
+          <tr class="table-primary fw-bold">
+            <th>Total</th>
+            <td class="text-end"><%= number_to_currency(@order.total) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= link_to "Back to My Orders", orders_path, class: "btn btn-secondary" %>
+  </div>
+
 </div>
-
-<h3>Items Ordered</h3>
-<table class="table table-striped mb-4">
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Qty</th>
-      <th>Price (each)</th>
-      <th>Total</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @order.order_items.each do |item| %>
-      <tr>
-        <td><%= item.product.name %></td>
-        <td><%= item.quantity %></td>
-        <td><%= number_to_currency(item.price_at_purchase) %></td>
-        <td><%= number_to_currency(item.quantity * item.price_at_purchase) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<h3>Taxes & Totals</h3>
-<table class="table">
-  <tbody>
-    <tr>
-      <th>Subtotal</th>
-      <td><%= number_to_currency(@order.subtotal) %></td>
-    </tr>
-    <tr>
-      <th>GST</th>
-      <td><%= number_to_currency(@order.gst_amount) %></td>
-    </tr>
-    <tr>
-      <th>PST</th>
-      <td><%= number_to_currency(@order.pst_amount) %></td>
-    </tr>
-    <tr>
-      <th>HST</th>
-      <td><%= number_to_currency(@order.hst_amount) %></td>
-    </tr>
-    <tr class="table-primary">
-      <th>Total</th>
-      <td><strong><%= number_to_currency(@order.total) %></strong></td>
-    </tr>
-  </tbody>
-</table>
-
-<% if @order.stripe_payment_id.present? %>
-  <p><strong>Payment ID:</strong> <%= @order.stripe_payment_id %></p>
-<% end %>
-
-<%= link_to "Back to Products", products_path, class: "btn btn-secondary mt-4" %>

@@ -1,69 +1,67 @@
 <h1>Checkout</h1>
 
-<%= form_with model: @order, local: true, data: { turbo: false }, method: :post do |f| %>
+<%= form_with scope: :order, url: new_order_path, method: :get, local: true, id: "order-form" do |f| %>
+
 
   <div class="mb-3">
     <%= f.label :address %>
-    <%= f.text_field :address, class: "form-control" %>
+    <%= f.text_field :address,
+          value: params.dig(:order, :address) || @order.address,
+          class: "form-control" %>
   </div>
 
   <div class="mb-3">
     <%= f.label :city %>
-    <%= f.text_field :city, class: "form-control" %>
+    <%= f.text_field :city,
+          value: params.dig(:order, :city) || @order.city,
+          class: "form-control" %>
   </div>
 
   <div class="mb-3">
     <%= f.label :postal_code %>
-    <%= f.text_field :postal_code, class: "form-control" %>
+    <%= f.text_field :postal_code,
+          value: params.dig(:order, :postal_code) || @order.postal_code,
+          class: "form-control" %>
   </div>
 
+  <!-- Province selection (same form, auto submits) -->
   <div class="mb-3">
     <%= f.label :province_id, "Province" %>
-    <%= f.collection_select :province_id, @provinces, :id, :name, {}, class: "form-select" %>
+    <%= f.collection_select :province_id, @provinces, :id, :name,
+          {
+            selected: params.dig(:order, :province_id) ||
+                      @order.province_id ||
+                      current_user&.province_id
+          },
+          class: "form-select",
+          onchange: "document.getElementById('order-form').submit();" %>
   </div>
 
-  <%= f.submit "Place Order", class: "btn btn-primary" %>
 <% end %>
 
 <hr>
 
-<h3>Order Summary</h3>
-
-<%# ---------- TAX & TOTAL CALCULATIONS ---------- %>
 <%
-  # Calculate subtotal
+  # Determine province from form params
+  selected_province_id =
+    params.dig(:order, :province_id) ||
+    @order.province_id ||
+    current_user&.province_id
+
+  province = selected_province_id ? Province.find(selected_province_id) : nil
+
+  # Compute subtotal
   subtotal = @cart.sum do |product_id, qty|
     product = Product.find(product_id)
     product.display_price * qty
   end
 
-  # Figure out which province applies
-  if params[:province_id].present?
-    province = Province.find(params[:province_id])
-  elsif current_user&.province
-    province = current_user.province
-  else
-    province = nil
-  end
-
-  # Calculate taxes
   gst = province ? subtotal * province.gst : 0
   pst = province ? subtotal * province.pst : 0
   hst = province ? subtotal * province.hst : 0
 
   total = subtotal + gst + pst + hst
 %>
-
-<%= form_with url: new_order_path, method: :get, local: true, id: "province-form" do %>
-  <%= label_tag :province_id, "Province" %>
-  <%= select_tag :province_id,
-        options_from_collection_for_select(@provinces, :id, :name, params[:province_id]),
-        class: "form-select",
-        onchange: "this.form.submit();" %>
-<% end %>
-
-
-<hr>
 
 <h3>Taxes & Total</h3>
 
@@ -73,25 +71,28 @@
       <th>Subtotal</th>
       <td><%= number_to_currency(subtotal) %></td>
     </tr>
-
     <tr>
       <th>GST (<%= province&.gst.to_f * 100 %>%)</th>
       <td><%= number_to_currency(gst) %></td>
     </tr>
-
     <tr>
       <th>PST (<%= province&.pst.to_f * 100 %>%)</th>
       <td><%= number_to_currency(pst) %></td>
     </tr>
-
     <tr>
       <th>HST (<%= province&.hst.to_f * 100 %>%)</th>
       <td><%= number_to_currency(hst) %></td>
     </tr>
-
     <tr class="table-primary">
       <th>Total</th>
       <td><strong><%= number_to_currency(total) %></strong></td>
     </tr>
   </tbody>
 </table>
+
+<!-- PAY NOW (Separate submit NOT linked to a form) -->
+<%= button_to "Pay Now",
+      create_checkout_session_path,
+      params: { province_id: selected_province_id },
+      method: :post,
+      class: "btn btn-primary" %>

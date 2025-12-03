@@ -1,15 +1,51 @@
-<h1>My Orders</h1>
+<div class="container mt-4">
+  <h1 class="fw-bold mb-4">My Orders</h1>
 
-<% if @orders.any? %>
-  <% @orders.each do |order| %>
-    <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 12px;">
-      <strong>Order #<%= order.id %></strong><br>
-      Subtotal: $<%= order.subtotal %><br>
-      Total: $<%= order.total %><br>
-      Status: <%= order.status %><br>
-      <%= link_to "View Details", order_path(order) %>
+  <% if @orders.empty? %>
+    <div class="alert alert-info">
+      You have no past orders yet.
     </div>
+  <% else %>
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Order #</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @orders.order(created_at: :desc).each do |order| %>
+          <tr>
+            <td><strong><%= order.id %></strong></td>
+
+            <td><%= order.created_at.strftime("%B %d, %Y") %></td>
+
+            <td>
+              <span class="badge 
+                <%= case order.status
+                    when "new"     then "bg-secondary"
+                    when "paid"    then "bg-success"
+                    when "shipped" then "bg-primary"
+                    else "bg-dark"
+                    end %>">
+                <%= order.status.capitalize %>
+              </span>
+            </td>
+
+            <td><strong><%= number_to_currency(order.total) %></strong></td>
+
+            <td>
+              <%= link_to "View Receipt",
+                  order_path(order),
+                  class: "btn btn-sm btn-outline-primary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   <% end %>
-<% else %>
-  <p>You have no past orders.</p>
-<% end %>
+</div>
