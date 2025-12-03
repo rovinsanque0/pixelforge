@@ -3,8 +3,8 @@
 <div class="card shadow-sm mb-4">
   <div class="card-body">
     <p class="text-muted mb-0">
-      Below is a complete list of all orders placed by all customers,
-      including taxes, totals, and product details.
+      Below is a complete list of all orders placed by all customers, including
+      order totals, taxes, and product details.
     </p>
   </div>
 </div>
@@ -27,39 +27,49 @@
   <tbody>
     <% @orders.each do |order| %>
       <tr>
+        <!-- Order ID -->
         <td><%= order.id %></td>
 
+        <!-- Customer Name -->
         <td><%= order.user&.name || "N/A" %></td>
 
-        <td><%= order.user&.email %></td>
+        <!-- Email -->
+        <td><%= order.user&.email || "N/A" %></td>
 
+        <!-- Date -->
         <td><%= order.created_at.strftime("%B %d, %Y") %></td>
 
+        <!-- Status Badge -->
         <td>
-          <% badge_class =
-               case order.status
-               when "paid"   then "bg-success"
-               when "shipped" then "bg-primary"
-               else "bg-warning"
-               end %>
+          <% badge =
+              case order.status
+              when "paid"    then "bg-success"
+              when "shipped" then "bg-primary"
+              else "bg-warning text-dark"
+              end %>
 
-          <span class="badge <%= badge_class %>">
+          <span class="badge <%= badge %>">
             <%= order.status.capitalize %>
           </span>
         </td>
 
+        <!-- Subtotal -->
         <td><%= number_to_currency(order.subtotal) %></td>
 
+        <!-- Taxes -->
         <td>
-          <strong>GST:</strong> <%= number_to_currency(order.gst_amount) %><br>
-          <strong>PST:</strong> <%= number_to_currency(order.pst_amount) %><br>
-          <strong>HST:</strong> <%= number_to_currency(order.hst_amount) %>
+          <div><strong>GST:</strong> <%= number_to_currency(order.gst_amount) %></div>
+          <div><strong>PST:</strong> <%= number_to_currency(order.pst_amount) %></div>
+          <div><strong>HST:</strong> <%= number_to_currency(order.hst_amount) %></div>
         </td>
 
-        <td class="fw-bold"><%= number_to_currency(order.total) %></td>
+        <!-- Total -->
+        <td class="fw-bold">
+          <%= number_to_currency(order.total) %>
+        </td>
 
-        <!-- PRODUCTS DROPDOWN -->
-        <td style="width: 280px;">
+        <!-- Product List (Collapsible) -->
+        <td style="width: 260px;">
           <button class="btn btn-sm btn-outline-secondary"
                   type="button"
                   data-bs-toggle="collapse"
@@ -67,8 +77,8 @@
             View Products
           </button>
 
-          <div class="collapse mt-2" id="order-products-<%= order.id %>">
-            <ul class="list-group">
+          <div id="order-products-<%= order.id %>" class="collapse mt-2">
+            <ul class="list-group small">
               <% order.order_items.each do |item| %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
@@ -85,4 +95,3 @@
     <% end %>
   </tbody>
 </table>
-
