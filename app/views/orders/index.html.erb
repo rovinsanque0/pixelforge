@@ -6,38 +6,46 @@
       You have no past orders yet.
     </div>
   <% else %>
-    <table class="table table-hover align-middle">
+
+    <table class="table table-bordered table-hover align-middle">
       <thead class="table-dark">
         <tr>
           <th>Order #</th>
           <th>Date</th>
           <th>Status</th>
           <th>Total</th>
-          <th></th>
+          <th>Details</th>
         </tr>
       </thead>
 
       <tbody>
         <% @orders.order(created_at: :desc).each do |order| %>
           <tr>
+            <!-- ORDER ID -->
             <td><strong><%= order.id %></strong></td>
 
+            <!-- DATE -->
             <td><%= order.created_at.strftime("%B %d, %Y") %></td>
 
+            <!-- STATUS BADGE -->
             <td>
-              <span class="badge 
-                <%= case order.status
-                    when "new"     then "bg-secondary"
-                    when "paid"    then "bg-success"
-                    when "shipped" then "bg-primary"
-                    else "bg-dark"
-                    end %>">
+              <% badge_class =
+                   case order.status
+                   when "paid"     then "bg-success"
+                   when "shipped"  then "bg-primary"
+                   when "new"      then "bg-secondary"
+                   else "bg-warning text-dark"
+                   end %>
+
+              <span class="badge <%= badge_class %>">
                 <%= order.status.capitalize %>
               </span>
             </td>
 
+            <!-- TOTAL -->
             <td><strong><%= number_to_currency(order.total) %></strong></td>
 
+            <!-- RECEIPT LINK -->
             <td>
               <%= link_to "View Receipt",
                   order_path(order),
@@ -47,5 +55,6 @@
         <% end %>
       </tbody>
     </table>
+
   <% end %>
 </div>
