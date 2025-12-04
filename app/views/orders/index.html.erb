@@ -31,14 +31,21 @@
             <td>
               <% badge_class =
                    case order.status
-                   when "paid"     then "bg-success"
-                   when "shipped"  then "bg-primary"
-                   when "new"      then "bg-secondary"
+                   when "new"           then "bg-secondary"
+                   when "paid"          then "bg-success"
+                   when "paid-shipped"  then "bg-primary"
+                   when "shipped"       then "bg-primary"
                    else "bg-warning text-dark"
                    end %>
 
+              <% status_label =
+                   case order.status
+                   when "paid-shipped" then "Shipped"
+                   else order.status.capitalize
+                   end %>
+
               <span class="badge <%= badge_class %>">
-                <%= order.status.capitalize %>
+                <%= status_label %>
               </span>
             </td>
 

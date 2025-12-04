@@ -1,29 +1,35 @@
-# README
+# PixelForge Store 🖥️  
+A Ruby on Rails e-commerce application for browsing and purchasing PC components.  
+Built with Ruby on Rails 7.2, PostgreSQL, and Bootstrap.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+---
 
-Things you may want to cover:
+## 📌 Table of Contents
+- [Requirements](#requirements)
+- [Local Setup (Without Docker)](#local-setup-without-docker)
+- [Docker Setup (Development)](#docker-setup-development)
+- [Running-the-App](#running-the-app)
+- [Database-Setup](#database-setup)
+- [Testing](#testing)
+- [Deployment Notes](#deployment-notes)
+- [Dataset Credit](#dataset-credit)
 
-* Ruby version
+---
 
-* System dependencies
+# Requirements
+- **Ruby 3.2.2**
+- **Rails 7.2.x**
+- **PostgreSQL (version TBD)**  
+- Recommended OS: Linux / macOS / Ubuntu / WSL2
 
-* Configuration
+---
 
-* Database creation
+# Local Setup (Without Docker)
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### 1. Install dependencies
+```bash
+bundle install
 
 
 
-data set retrieved from: https://www.kaggle.com/datasets/iliassekkaf/computerparts/data
-# pixelforge
+#setup database
